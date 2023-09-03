@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>抽签链接</title>
+    <!-- 引入Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <style>
+        body {
+            font-size: 18px;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
+            padding: 10px; /* 增加一些内边距 */
+        }
+        .list-group-item .link-span {
+            flex: 1; /* 让 span 占据剩余空间 */
+            font-size: 16px;
+        }
+        .list-group-item input[type="text"] {
+            display: none; /* 隐藏文本框 */
+        }
+        .copy-button {
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        #copy-all-button {
+            font-size: 24px;
+            display: inline-block; /* 使按钮分开并列排放 */
+            margin-bottom: 10px; /* 增加下边距 */
+            text-align: center; /* 居中文本 */
+        }
+        #copy-all-button-container {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">抽签链接，活动：{{ activity_id }}</h1>
+
+        <div id="copy-all-button-container">
+            <button class="btn btn-primary" id="copy-all-button">复制所有链接</button>
+        </div>
+
+        <ul class="list-group mt-3">
+            {% for link, label in user_links %}
+                <li class="list-group-item">
+                    <div>
+                        <a href="{{ link }}" class="link-span">{{ label }}</a>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <!-- 引入Clipboard.js，替换以下链接为您自己的CDN链接 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <script>
+        function copyToClipboard() {
+            const textToCopy = [];
+            const linkElements = document.querySelectorAll('a.link-span');
+            linkElements.forEach(function(element) {
+                const label = element.textContent;
+                const link = element.getAttribute('href');
+                textToCopy.push(`${label}： ${link}\n`);
+            });
+
+            // 加入抽签结果链接
+            const activityResultsLink = "{{ activity_results_url }}"; // 请替换成实际的抽签结果链接
+            textToCopy.push(`抽签结果链接： ${activityResultsLink}\n\n`);
+
+            const text = textToCopy.join('\n');
+            const input = document.createElement('textarea');
+            input.value = text;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand('copy');
+            document.body.removeChild(input);
+            alert('抽签链接已复制到剪切板！可直接在微信聊天框中粘贴使用');
+        }
+
+
+        const copyAllButton = document.getElementById('copy-all-button');
+        copyAllButton.addEventListener('click', function() {
+            copyToClipboard();
+        });
+    </script>
+</body>
+</html>

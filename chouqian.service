@@ -1,0 +1,13 @@
+[Unit]
+Description=Chouqian App
+After=network.target
+
+[Service]
+Environment="PATH=/opt/chouqian/venv/bin"
+ExecStart=/opt/chouqian/venv/bin/python3 /opt/chouqian/app.py
+WorkingDirectory=/opt/chouqian
+Restart=always
+User=nobody
+
+[Install]
+WantedBy=multi-user.target

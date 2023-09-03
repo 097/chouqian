@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>最近的抽签活动链接</title>
+    <!-- 引入Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">最近的抽签活动链接</h1>
+
+        {% if recent_activity_links %}
+        <ul class="list-group mt-3">
+            {% for link in recent_activity_links %}
+                <li class="list-group-item">
+                    <a href="{{ url_for('cq.activity_results', activity_id=link) }}">查看活动结果：{{ link }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>无</p>
+        {% endif %}
+    </div>
+
+    <!-- 引入其他必要的脚本和样式 -->
+
+</body>
+</html>

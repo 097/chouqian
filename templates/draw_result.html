@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>抽签结果</title>
+    <!-- 引入Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa; /* 添加背景颜色 */
+        }
+        .container {
+            margin-top: 50px;
+            text-align: center;
+            background-color: #fff; /* 添加背景颜色 */
+            padding: 20px;
+            border-radius: 10px; /* 添加圆角边框 */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+        }
+        h1 {
+            color: #007bff; /* 修改标题颜色 */
+        }
+        p {
+            font-size: 18px; /* 修改文本字体大小 */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>抽签结果</h1>
+        <p><strong>活动 ID：</strong>{{ activity_id }}</p>
+        <p><strong>您的用户编号为：</strong>{{ user_number }}</p>
+        <p><strong>您的抽签结果为：</strong>{{ group_number }}</p>
+    </div>
+
+</body>
+</html>

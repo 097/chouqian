@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>活动结果</title>
+    <!-- 引入Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
+    <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <!-- 自定义CSS样式 -->
+    <style>
+        body {
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-result {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-result p {
+            margin: 0;
+        }
+
+        .user-result span {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">活动结果</h1>
+        <div class="mt-3">
+            {% if user_draw_results %}
+                {% for user_draw_result in user_draw_results %}
+                    <div class="user-result">
+                        <p>{{ user_draw_result }}</p>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>暂无结果</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 引入Clipboard.js，替换以下链接为您自己的CDN链接 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
+    <script>
+        // 省略复制到剪贴板的 JavaScript 代码
+    </script>
+</body>
+</html>
