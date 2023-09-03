@@ -3,6 +3,7 @@
 
 # Prepare
 
+```
 sudo apt update
 sudo apt install python3
 sudo apt install python3-pip
@@ -13,3 +14,5 @@ virtualenv venv
 source venv/bin/activate
 
 pip install flask
+
+```
