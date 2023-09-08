@@ -176,5 +176,5 @@ def activity_results(activity_id):
 
 if __name__ == '__main__':
     app.register_blueprint(cq_blueprint)
-    app.run(port=5001)
+    app.run(port=5001,debug=True)
 

@@ -56,14 +56,125 @@
                     <option value="30">30</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary btn-block">生成抽签链接</button>
+            <div class="form-group" id="fixed-partner-options">
+                <label>选择固定搭档：</label>
+                <!-- 固定搭档的下拉菜单，使用Bootstrap的row和col类 -->
+                <div class="row">
+                    <div class="col">
+                        <select class="custom-select" id="partner1" name="partner1">
+                            <!-- 选项内容由JavaScript动态生成 -->
+                        </select>
+                    </div>
+                    <div class="col">
+                        <p class="text-center">和</p>
+                    </div>
+                    <div class="col">
+                        <select class="custom-select" id="partner2" name="partner2">
+                            <!-- 选项内容由JavaScript动态生成 -->
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+        <button type="submit" class="btn btn-primary btn-block">生成抽签链接</button>
         </form>
     </div>
-    <!-- 添加一个链接到 recent_activity_links.html -->
-    <!-- 添加一个链接到 recent_activity_links.html，居中显示 -->
+
     <div class="container text-center">
         <a href="{{ url_for('cq.recent_activity_links') }}">查看最近的活动链接</a>
     </div>
 
+<!-- 更新JavaScript代码以动态生成固定搭档下拉菜单的选项 -->
+<script>
+    // 在页面加载完成后执行以下代码
+window.addEventListener('load', (event) => {
+    // 获取固定搭档的下拉菜单元素
+    const partner1Select = document.getElementById('partner1');
+    const partner2Select = document.getElementById('partner2');
+
+    // 设置默认抽签人数
+    const defaultNumOfPeople = 12;
+
+    // 添加默认选项
+    const defaultOption = document.createElement('option');
+    defaultOption.text = '无固定搭档';
+    defaultOption.value = '';
+    partner1Select.appendChild(defaultOption);
+
+
+   // 根据默认抽签人数生成下拉菜单选项
+    for (let i = 1; i <= defaultNumOfPeople; i++) {
+        const option1 = document.createElement('option');
+        option1.value = i;
+        option1.text = i;
+
+        partner1Select.appendChild(option1);
+    }
+
+    // 添加事件监听器，确保第二个下拉菜单的选项不包含第一个下拉菜单的值
+    partner1Select.addEventListener('change', () => {
+        // 获取第一个下拉菜单的选择值
+        const selectedValue = partner1Select.value;
+
+        // 清除第二个下拉菜单的选项
+        partner2Select.innerHTML = '';
+
+
+        const defaultOption2 = document.createElement('option');
+        defaultOption2.text = '无固定搭档';
+        defaultOption2.value = '';
+        partner2Select.appendChild(defaultOption2);
+
+        // 重新生成第二个下拉菜单的选项，不包含第一个下拉菜单的值
+        for (let i = 1; i <= defaultNumOfPeople; i++) {
+            if (i !== parseInt(selectedValue)) {
+                const option2 = document.createElement('option');
+                option2.value = i;
+                option2.text = i;
+
+                partner2Select.appendChild(option2);
+            }
+        }
+    });
+
+});
+
+    // 获取抽签人数的下拉菜单
+    const numSelect = document.getElementById('num_of_people');
+    // 获取固定搭档的下拉菜单
+    const partner1Select = document.getElementById('partner1');
+    const partner2Select = document.getElementById('partner2');
+
+    // 根据选择的抽签人数动态更新固定搭档的选项
+    numSelect.addEventListener('change', () => {
+        // 清空固定搭档下拉菜单的选项
+        partner1Select.innerHTML = '';
+        partner2Select.innerHTML = '';
+
+        // 获取选择的抽签人数
+        const numPeople = parseInt(numSelect.value);
+
+        // 添加默认选项
+        const defaultOption = document.createElement('option');
+        defaultOption.text = '无固定搭档';
+        defaultOption.value = '';
+        partner1Select.appendChild(defaultOption);
+
+        const defaultOption2 = document.createElement('option');
+        defaultOption2.text = '无固定搭档';
+        defaultOption2.value = '';
+        partner2Select.appendChild(defaultOption2);
+
+        // 动态生成固定搭档的选项
+        for (let i = 1; i <= numPeople; i++) {
+            const option = document.createElement('option');
+            option.text = `${i}`;
+            option.value = i;
+            partner1Select.appendChild(option);
+            partner2Select.appendChild(option.cloneNode(true));
+        }
+    });
+</script>
 </body>
+
 </html>
