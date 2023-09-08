@@ -57,7 +57,7 @@
                 </select>
             </div>
             <div class="form-group">
-                <label for="fixed_count_select">选择固定搭档数量：</label>
+                <label for="fixed_count_select">选择固定组合数量：</label>
                 <select class="custom-select" id="fixed_count_select" name="fixed_count_select">
                     <option value="0" selected>0</option>
                     <option value="1">1</option>
@@ -93,18 +93,18 @@
 
             for (let i = 1; i <= fixedCount; i++) {
                 const partnerDiv = document.createElement('div');
-                partnerDiv.classList.add('row', 'mb-2');
+                partnerDiv.classList.add('form-group', 'row'); // 添加新的样式类
 
                 const partnerLabel = document.createElement('label');
-                partnerLabel.classList.add('col-form-label', 'col-2');
-                partnerLabel.textContent = `固定搭档${i}：`;
+                partnerLabel.classList.add('col-4', 'col-form-label'); // 调整样式类
+                partnerLabel.textContent = `固定组合${i}：`;
 
                 const partnerSelect1 = document.createElement('select');
-                partnerSelect1.classList.add('custom-select', 'col-4');
+                partnerSelect1.classList.add('custom-select', 'col-2');
                 partnerSelect1.name = `partner${i}_1`;
 
                 const partnerSelect2 = document.createElement('select');
-                partnerSelect2.classList.add('custom-select', 'col-4');
+                partnerSelect2.classList.add('custom-select', 'col-2');
                 partnerSelect2.name = `partner${i}_2`;
 
                 for (let j = 1; j <= parseInt(numSelect.value); j++) {
@@ -117,7 +117,7 @@
 
                 partnerDiv.appendChild(partnerLabel);
                 partnerDiv.appendChild(partnerSelect1);
-                partnerDiv.innerHTML += '<p class="col-2 text-center">和</p>';
+                partnerDiv.innerHTML += '<p class="col-2 col-form-label text-center">和</p>';
                 partnerDiv.appendChild(partnerSelect2);
 
                 partnerSelection.appendChild(partnerDiv);
