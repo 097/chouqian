@@ -74,15 +74,6 @@ def index():
         current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         # 为每位用户生成包含随机字符的抽签链接，并分配用户编号
-        user_links = []
-        host = request.host
-        for i in range(1, n + 1):
-            random_chars = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
-            user_link_id = link_id + random_chars
-            user_links.append((f"http://{host}/cq/sd/{user_link_id}", f"用户 {i} 抽签链接"))  # 包含 '/start_draw/' 部分
-            # 将用户编号与链接关联起来并存储在内存中
-            user_numbers[user_link_id] = i
-
         # 生成固定搭档的字典，键为用户编号，值为其固定搭档的用户编号
         fixed_partner_assignments = {}
         for i in range(1, fixed_count + 1):
@@ -96,8 +87,24 @@ def index():
             fixed_partner_assignments[partner1] = partner2
             fixed_partner_assignments[partner2] = partner1
 
-
         print("存入的固定搭档信息:", fixed_partner_assignments)
+
+        # 为每位用户生成包含随机字符的抽签链接，并分配用户编号
+        user_links = []
+        host = request.host
+        for i in range(1, n + 1):
+            random_chars = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
+            user_link_id = link_id + random_chars
+            user_label = f"用户 {i} 抽签链接"
+
+            # 判断用户是否属于固定组合，并添加相应标记
+            fixed_group_user = 0
+            if i in fixed_partner_assignments:
+                fixed_group_user = 1
+
+            user_links.append((f"http://{host}/cq/sd/{user_link_id}", user_label, fixed_group_user))  # 包含 '/start_draw/' 部分
+            # 将用户编号与链接关联起来并存储在内存中
+            user_numbers[user_link_id] = i
 
         # 将抽签人数、固定搭档数量和固定搭档分配保存到活动数据中
         activity_data[link_id] = {'num_of_people': n, 'fixed_count': fixed_count, 'fixed_partners': fixed_partner_assignments, 'creation_time': current_time}

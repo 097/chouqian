@@ -61,10 +61,13 @@
         </div>
 
         <ul class="list-group mt-3">
-            {% for link, label in user_links %}
+            {% for link, label, fixed_user in user_links %}
                 <li class="list-group-item">
                     <div>
                         <a href="{{ link }}" class="link-span">{{ label }}</a>
+                        {% if fixed_user == 1 %}
+                            <span class="badge badge-info ml-2">固定组合</span>
+                        {% endif %}
                     </div>
                 </li>
             {% endfor %}
