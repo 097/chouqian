@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>最近的抽签活动链接</title>
+    <title>最近的抽签活动</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 引入Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
 </head>
@@ -13,7 +14,7 @@
         <ul class="list-group mt-3">
             {% for link in recent_activity_links %}
                 <li class="list-group-item">
-                    <a href="{{ url_for('cq.activity_results', activity_id=link) }}">查看活动结果：{{ link }}</a>
+                    <a href="{{ url_for('cq.activity_results', activity_id=link) }}">查看抽签结果：{{ link }}</a>
                 </li>
             {% endfor %}
         </ul>
