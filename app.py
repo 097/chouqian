@@ -181,38 +181,51 @@ def start_draw(link_id):
 def activity_results(activity_id):
     # 获取指定活动的队伍分配数据
     group_assignment = activity_group_assignments.get(activity_id)
-    n = activity_data.get(activity_id)
+    n = int(activity_data.get(activity_id, {}).get('num_of_people', 0))
 
     if group_assignment is not None:
-        # 创建一个空列表来保存每个用户的抽签结果
-        user_draw_results = []
+        # 初始化两个字典
+        user_group_dict = {}
+        group_user_dict = {}
 
-        # 遍历队伍分配数据，查找每个用户的抽签结果
+        # 遍历队伍分配数据，查找每个用户的组号
         for user_number, group_number in group_assignment.items():
-            draw_status_id= f"{activity_id}_{user_number}"
-
+            draw_status_id = f"{activity_id}_{user_number}"
             local_draw_status = draw_status.get(draw_status_id, False)
 
+            # 更新user_group_dict
             if local_draw_status:
-                user_draw_result = f"用户 {user_number}: 组 {group_number}"
+                user_group_dict[user_number] = group_number
             else:
-                user_draw_result = f"用户 {user_number}: 未抽签"
-            user_draw_results.append(user_draw_result)
+                user_group_dict[user_number] = -1
 
-        # 按用户编号从小到大排序
-        user_draw_results.sort(key=lambda x: int(re.search(r'\d+', x).group()))
-        return render_template('activity_results.html', user_draw_results=user_draw_results)
-    elif n is not None:
-        # 创建一个空列表来保存每个用户的抽签结果
-        user_draw_results = []
+            # 更新group_user_dict
+            if group_number not in group_user_dict:
+                group_user_dict[group_number] = []
 
-        # 生成 n 个 "用户 X: 未抽签" 的字符串
-        for user_number in range(1, n + 1):
-            user_draw_result = f"用户 {user_number}: 未抽签"
-            user_draw_results.append(user_draw_result)
-        return render_template('activity_results.html', user_draw_results=user_draw_results)
+            # 考虑local_draw_status，只有当local_draw_status为True时才添加用户
+            if local_draw_status:
+                group_user_dict[group_number].append(user_number)
+
+        # 对group_user_dict中的用户列表按用户编号排序
+        for group_number, user_list in group_user_dict.items():
+            if len(user_list) < 2:
+                # 如果用户列表元素个数不足2个，补充编号为999的用户
+                user_list.extend([999] * (2 - len(user_list)))
+            group_user_dict[group_number] = sorted(user_list)
+
+        # 按键从小到大排序 user_group_dict 和 group_user_dict
+        user_group_dict = dict(sorted(user_group_dict.items()))
+        group_user_dict = dict(sorted(group_user_dict.items()))    
+        return render_template('activity_results.html', user_group_dict=user_group_dict, group_user_dict=group_user_dict)
+    elif n !=0 :
+        # 初始化两个字典
+        user_group_dict = {user_number: -1 for user_number in range(1, n + 1)}
+        group_user_dict = {group_number: [999, 999] for group_number in range(1, n // 2 + 1)}
+
+        return render_template('activity_results.html', user_group_dict=user_group_dict, group_user_dict=group_user_dict)
     else:
-        return "无效的活动 ID"        
+        return "无效的活动 ID"
 
 
 if __name__ == '__main__':

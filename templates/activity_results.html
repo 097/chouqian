@@ -2,63 +2,90 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>活动结果</title>
-    <!-- 引入Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>抽签活动结果</title>
+    <!-- 使用Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
     <!-- 自定义CSS样式 -->
     <style>
+        /* 自定义样式 */
         body {
-            background-color: #f4f4f4;
-            padding: 20px;
+            background-color: #f8f9fa;
         }
 
         .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
         }
 
-        .user-result {
-            margin-bottom: 10px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        h1 {
+            text-align: center;
         }
 
-        .user-result p {
-            margin: 0;
+        table {
+            width: 100%;
         }
 
-        .user-result span {
-            font-weight: bold;
+        table, th, td {
+            border: 1px solid #dee2e6;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-4">活动结果</h1>
-        <div class="mt-3">
-            {% if user_draw_results %}
-                {% for user_draw_result in user_draw_results %}
-                    <div class="user-result">
-                        <p>{{ user_draw_result }}</p>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>暂无结果</p>
-            {% endif %}
-        </div>
-    </div>
+        <h1 class="mt-3">抽签结果</h1>
 
-    <!-- 引入Clipboard.js，替换以下链接为您自己的CDN链接 -->
-    <script src="https://cdn.bootcdn.net/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
-    <script>
-        // 省略复制到剪贴板的 JavaScript 代码
-    </script>
+        <!-- 展示 group_user_dict -->
+        <h2>各组人员：</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">组号</th>
+                    <th scope="col">用户列表</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for group_number, user_list in group_user_dict.items() %}
+                    <tr>
+                        <td>组 {{ group_number }}</td>
+                        <td>
+                            {% for user_number in user_list %}
+                                {% if user_number == 999 %}
+                                    未产生
+                                {% else %}
+                                    用户 {{ user_number }}
+                                {% endif %}
+                                {% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- 展示 user_group_dict -->
+        <h2>各人分组：</h2>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">用户编号</th>
+                    <th scope="col">组号</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user_number, group_number in user_group_dict.items() %}
+                    <tr>
+                        <td>用户 {{ user_number }}</td>
+                        <td>{% if group_number == -1 %}未抽签{% else %}组 {{ group_number }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
