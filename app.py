@@ -79,7 +79,7 @@ def index():
         for i in range(1, n + 1):
             random_chars = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
             user_link_id = link_id + random_chars
-            user_links.append((f"http://{host}/cq/sd/{user_link_id}", f"用户 {i} 抽签地址"))  # 包含 '/start_draw/' 部分
+            user_links.append((f"http://{host}/cq/sd/{user_link_id}", f"用户 {i} 抽签链接"))  # 包含 '/start_draw/' 部分
             # 将用户编号与链接关联起来并存储在内存中
             user_numbers[user_link_id] = i
 
