@@ -6,6 +6,12 @@ import logging
 import logging.handlers
 import sys
 from datetime import datetime
+import os
+import pickle
+import errno
+
+# 定义数据文件的保存目录
+data_directory = '/var/chouqian'
 
 
 app = Flask(__name__)
@@ -17,9 +23,6 @@ cq_blueprint = Blueprint('cq', __name__, url_prefix='/cq')
 # 存储抽签活动数据的字典，键为活动链接的随机部分，值为抽签人数
 activity_data = {}
 
-# 存储用户分组数据的字典，键为活动链接，值为用户所在的组号
-user_data = {}
-
 # 存储抽签活动状态的字典，键为活动链接，值为活动是否已开始抽签
 draw_status = {}
 
@@ -28,6 +31,11 @@ user_numbers = {}
 
 # 存储每个活动的队伍分配数据的字典，键为活动链接，值为队伍分配
 activity_group_assignments = {}
+
+FILE_ACTIVITY_DATA="activity_data.pkl"
+FILE_DRAW_STATUS="draw_status.pkl"
+FILE_USER_NUMBERS="user_numbers.pkl"
+FILE_ACTIVITY_GROUP_ASSIGNMENTS="activity_group_assignments.pkl"
 
 
 # Configure logging to send log messages to syslog
@@ -93,6 +101,8 @@ def index():
 
         # 将抽签人数、固定搭档数量和固定搭档分配保存到活动数据中
         activity_data[link_id] = {'num_of_people': n, 'fixed_count': fixed_count, 'fixed_partners': fixed_partner_assignments, 'creation_time': current_time}
+        save_data_to_file(user_numbers, FILE_USER_NUMBERS)
+        save_data_to_file(activity_data, FILE_ACTIVITY_DATA)
 
         return render_template('links.html', user_links=user_links, activity_id=link_id,
                                activity_results_url=f"http://{host}/cq/ar/{link_id}", creation_time=current_time)
@@ -174,6 +184,10 @@ def start_draw(link_id):
             draw_status[draw_status_id] = True
             # 将队伍分配保存在全局字典中，并与活动链接关联
             activity_group_assignments[activity_id] = group_assignment
+
+            save_data_to_file(draw_status, FILE_DRAW_STATUS)
+            save_data_to_file(activity_group_assignments, FILE_ACTIVITY_GROUP_ASSIGNMENTS)
+
             return redirect(url_for('cq.start_draw', link_id=link_id))
 
         else:
@@ -184,6 +198,9 @@ def start_draw(link_id):
         group_assignment = activity_group_assignments.get(activity_id)
         group_number = group_assignment.get(user_number)
         draw_status[draw_status_id] = True
+
+        save_data_to_file(draw_status, FILE_DRAW_STATUS)
+
         return render_template('draw_result.html', link_id=link_id, group_number=group_number, user_number=user_number, activity_id=activity_id, creation_time=creation_time)
     else:
         return render_template('draw.html', link_id=link_id, local_draw_status=local_draw_status, user_number=user_number, activity_id=activity_id, creation_time=creation_time)
@@ -243,7 +260,39 @@ def activity_results(activity_id):
         return "无效的活动 ID"
 
 
+# 创建用于保存数据的函数
+def save_data_to_file(data, filename):
+    file_path = os.path.join(data_directory, filename)
+    with open(file_path, 'wb') as file:
+        pickle.dump(data, file)
+
+
+# 创建用于加载数据的函数
+def load_data_from_file(filename, default_data=None):
+    file_path = os.path.join(data_directory, filename)
+    try:
+        with open(file_path, 'rb') as file:
+            data = pickle.load(file)
+            return data
+    except (FileNotFoundError, EOFError):
+        return default_data
+
+
 if __name__ == '__main__':
+    # 如果目录不存在，创建它
+    try:
+        os.makedirs(data_directory)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            # 创建目录失败，将数据保存到 /tmp 目录下
+            data_directory = '/tmp'
+
+
+    activity_data = load_data_from_file(FILE_ACTIVITY_DATA, {})
+    draw_status = load_data_from_file(FILE_DRAW_STATUS, {})
+    user_numbers = load_data_from_file(FILE_USER_NUMBERS, {})
+    activity_group_assignments = load_data_from_file(FILE_ACTIVITY_GROUP_ASSIGNMENTS, {})
+
     app.register_blueprint(cq_blueprint)
     app.run(port=5001)
 
