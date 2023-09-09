@@ -5,6 +5,7 @@ import re
 import logging
 import logging.handlers
 import sys
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -61,6 +62,9 @@ def index():
         # 生成一个随机的活动ID（6位数字和小写字母组成）
         link_id = ''.join(random.choices(string.ascii_lowercase + string.digits, k=3))
 
+        # 获取当前时间并将其格式化为字符串
+        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
         # 为每位用户生成包含随机字符的抽签链接，并分配用户编号
         user_links = []
         host = request.host
@@ -88,10 +92,10 @@ def index():
         print("存入的固定搭档信息:", fixed_partner_assignments)
 
         # 将抽签人数、固定搭档数量和固定搭档分配保存到活动数据中
-        activity_data[link_id] = {'num_of_people': n, 'fixed_count': fixed_count, 'fixed_partners': fixed_partner_assignments}
+        activity_data[link_id] = {'num_of_people': n, 'fixed_count': fixed_count, 'fixed_partners': fixed_partner_assignments, 'creation_time': current_time}
 
         return render_template('links.html', user_links=user_links, activity_id=link_id,
-                               activity_results_url=f"http://{host}/cq/ar/{link_id}")
+                               activity_results_url=f"http://{host}/cq/ar/{link_id}", creation_time=current_time)
 
     return render_template('index.html')
 
@@ -101,7 +105,13 @@ def recent_activity_links():
     # 获取最近的 20 个活动链接
     recent_activity_links = list(reversed(activity_data.keys()))
 
-    return render_template('recent_activity_links.html', recent_activity_links=recent_activity_links)
+    # 创建一个字典，将每个活动链接与创建时间关联
+    activity_links_with_time = []
+    for link in recent_activity_links:
+        creation_time = activity_data.get(link, {}).get('creation_time', "未知时间")
+        activity_links_with_time.append((link, creation_time))
+
+    return render_template('recent_activity_links.html', recent_activity_links=activity_links_with_time)
 
 
 @cq_blueprint.route('/sd/<string:link_id>', methods=['GET', 'POST'])
@@ -110,10 +120,13 @@ def start_draw(link_id):
     activity_id = link_id[:3]
     activity_info = activity_data.get(activity_id)
     n = activity_info['num_of_people'] if activity_info else None
+    creation_time = activity_info['creation_time'] if activity_info else None
     user_number = user_numbers.get(link_id)  # 获取用户编号
 
     draw_status_id = f"{activity_id}_{user_number}"
     local_draw_status = draw_status.get(draw_status_id, False)
+
+    print("activity id:", activity_id, ", 创建时间:", creation_time)
 
     if n is None or user_number is None:
         return "无效的链接"
@@ -164,16 +177,16 @@ def start_draw(link_id):
             return redirect(url_for('cq.start_draw', link_id=link_id))
 
         else:
-            return render_template('draw.html', link_id=link_id, local_draw_status=local_draw_status, user_number=user_number, activity_id=activity_id)
+            return render_template('draw.html', link_id=link_id, local_draw_status=local_draw_status, user_number=user_number, activity_id=activity_id, creation_time=creation_time)
 
     if local_draw_status or request.method == 'POST':
         # 如果已经进行了队伍分配，直接显示抽签结果
         group_assignment = activity_group_assignments.get(activity_id)
         group_number = group_assignment.get(user_number)
         draw_status[draw_status_id] = True
-        return render_template('draw_result.html', link_id=link_id, group_number=group_number, user_number=user_number, activity_id=activity_id)
+        return render_template('draw_result.html', link_id=link_id, group_number=group_number, user_number=user_number, activity_id=activity_id, creation_time=creation_time)
     else:
-        return render_template('draw.html', link_id=link_id, local_draw_status=local_draw_status, user_number=user_number, activity_id=activity_id)
+        return render_template('draw.html', link_id=link_id, local_draw_status=local_draw_status, user_number=user_number, activity_id=activity_id, creation_time=creation_time)
 
 
 
@@ -181,7 +194,9 @@ def start_draw(link_id):
 def activity_results(activity_id):
     # 获取指定活动的队伍分配数据
     group_assignment = activity_group_assignments.get(activity_id)
-    n = int(activity_data.get(activity_id, {}).get('num_of_people', 0))
+    activity_info = activity_data.get(activity_id, {})
+    n = activity_info.get('num_of_people', 0)
+    creation_time = activity_info.get('creation_time', '')
 
     if group_assignment is not None:
         # 初始化两个字典
@@ -217,13 +232,13 @@ def activity_results(activity_id):
         # 按键从小到大排序 user_group_dict 和 group_user_dict
         user_group_dict = dict(sorted(user_group_dict.items()))
         group_user_dict = dict(sorted(group_user_dict.items()))    
-        return render_template('activity_results.html', user_group_dict=user_group_dict, group_user_dict=group_user_dict)
+        return render_template('activity_results.html', user_group_dict=user_group_dict, group_user_dict=group_user_dict, activity_id=activity_id, creation_time=creation_time)
     elif n !=0 :
         # 初始化两个字典
         user_group_dict = {user_number: -1 for user_number in range(1, n + 1)}
         group_user_dict = {group_number: [999, 999] for group_number in range(1, n // 2 + 1)}
 
-        return render_template('activity_results.html', user_group_dict=user_group_dict, group_user_dict=group_user_dict)
+        return render_template('activity_results.html', user_group_dict=user_group_dict, group_user_dict=group_user_dict, activity_id=activity_id, creation_time=creation_time)
     else:
         return "无效的活动 ID"
 

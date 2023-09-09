@@ -34,11 +34,17 @@
             padding: 8px;
             text-align: left;
         }
+
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-3">抽签结果</h1>
+        <h1 class="mt-4">抽签结果</h1>
+
+        <div class="mt-3">
+            <p><strong>抽签活动 ID：</strong>{{ activity_id }}</p>
+            <p><strong>活动创建时间：</strong>{{ creation_time }}</p>
+        </div>
 
         <!-- 展示 group_user_dict -->
         <h2>各组人员：</h2>

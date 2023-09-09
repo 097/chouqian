@@ -73,7 +73,7 @@
     </div>
 
     <div class="container text-center">
-        <a href="{{ url_for('cq.recent_activity_links') }}">查看最近的活动链接</a>
+        <a href="{{ url_for('cq.recent_activity_links') }}">查看最近的抽签活动结果</a>
     </div>
 
     <!-- 更新JavaScript代码以动态生成固定搭档下拉菜单的选项 -->
@@ -169,7 +169,7 @@
                 const selectedValue = select.value;
                 if (selectedValue !== '' && selectedPartners.has(selectedValue)) {
                     event.preventDefault();
-                    alert('固定搭档选择不正确：有重复的用户编号。');
+                    alert('固定组合选择不正确：有重复的用户编号。');
                 } else {
                     selectedPartners.add(selectedValue);
                 }

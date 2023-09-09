@@ -5,19 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- 引入Bootstrap CSS，替换以下链接为您自己的CDN链接 -->
     <link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
+    <style>
+        h1 {
+            text-align: center;
+            font-size: 24px; /* 调整字体大小 */
+        }
+        table {
+            width: 100%;
+        }
+
+        table, th, td {
+            border: 1px solid #dee2e6;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="mt-4">最近的抽签活动链接</h1>
+        <h1 class="mt-4">最近的抽签活动</h1>
 
         {% if recent_activity_links %}
-        <ul class="list-group mt-3">
-            {% for link in recent_activity_links %}
-                <li class="list-group-item">
-                    <a href="{{ url_for('cq.activity_results', activity_id=link) }}">查看抽签结果：{{ link }}</a>
-                </li>
-            {% endfor %}
-        </ul>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th scope="col">抽签结果</th>
+                    <th scope="col">创建时间</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for link, creation_time in recent_activity_links %}
+                <tr>
+                    <td><a href="{{ url_for('cq.activity_results', activity_id=link) }}">查看抽签结果：{{ link }}</a></td>
+                    <td>{{ creation_time }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         {% else %}
             <p>无</p>
         {% endif %}
